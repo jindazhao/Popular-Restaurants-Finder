@@ -15,33 +15,44 @@ namespace Popular_Restaurants_Finder
         public static string location;
         static void Main(string[] args)
         {
-            //Console.WriteLine("_____________________________________________________");
-            //Console.WriteLine("Hello! Welcome to Jinda's Popular Restaurant Finder!");
-            //Console.WriteLine("_____________________________________________________");
-            //Console.WriteLine("_____________________________________________________");
-            //Console.WriteLine("                                                     ");
+            Console.WriteLine("_____________________________________________________");
+            Console.WriteLine("Hello! Welcome to Jinda's Popular Restaurant Finder!");
+            Console.WriteLine("_____________________________________________________");
+            Console.WriteLine("_____________________________________________________");
+            Console.WriteLine("                                                     ");
 
-            //Console.Write("Enter the desired location: ");
-            //location = Console.ReadLine();
-
-            convertLocation("vancouver");
+            Console.Write("Enter the desired location: ");
+            location = Console.ReadLine();
+            FindRestaurants(getLat(location), getLng(location));
 
             Console.ReadLine();
         }
 
-        static void FindRestaurants(float lat, float lang)
+        static void FindRestaurants(double lat, double lang)
         {
             var client = new RestClient("https://appetitoso-best-food-dishes-v1.p.rapidapi.com/dish/suggestions/?radius=15&lang=it&lat=" + lat + "&lng=" + lang);
             var request = new RestRequest(Method.GET);
             request.AddHeader("x-rapidapi-host", "appetitoso-best-food-dishes-v1.p.rapidapi.com");
             request.AddHeader("x-rapidapi-key", "2c55019311msha703d4f4d477ac6p1b0a95jsn20b3f6f65c02");
             IRestResponse response = client.Execute(request);
-            //https://rapidapi.com/appetitoso/api/food-search-engine?endpoint=55cdb48ce4b0b74f06700640
+            JObject restaurants = JObject.Parse(response.Content);
+            List<string> restaurantlist = null;
 
+            
+            foreach (var content in restaurants["content"])
+            {
+                if ((int) content["avgRating"] > 4)
+                {
+                    restaurantlist.Add((string)content["restaurant"]["name"]);
+                }
+                
+            }
 
+            Console.WriteLine(restaurantlist);
+      
         }
 
-        static void convertLocation(string location) //AIzaSyDvpMap1ymxW9JFxPc_WT9JvJWbxG0fhP0 <- API key
+        static float getLat(string location) //AIzaSyDvpMap1ymxW9JFxPc_WT9JvJWbxG0fhP0 <- API key
         {
             var client = new RestClient("https://google-maps-geocoding.p.rapidapi.com/geocode/json?language=en&address=" + location);
             var request = new RestRequest(Method.GET);
@@ -50,14 +61,24 @@ namespace Popular_Restaurants_Finder
             IRestResponse response = client.Execute(request);
             JObject jobject = JObject.Parse(response.Content);
 
-            var lat = jobject["results"]
-           
-            
-            //["bounds"]["northeast"]["lat"];
+            var lat = jobject["geometry"]["location"]["lat"];
 
-            Console.WriteLine(lat);
+            return (float) lat.ToObject<double>();
+      
+        }
 
-            //float lat = jobject.GetValue("results");
+        static float getLng(string location) //AIzaSyDvpMap1ymxW9JFxPc_WT9JvJWbxG0fhP0 <- API key
+        {
+            var client = new RestClient("https://google-maps-geocoding.p.rapidapi.com/geocode/json?language=en&address=" + location);
+            var request = new RestRequest(Method.GET);
+            request.AddHeader("x-rapidapi-host", "google-maps-geocoding.p.rapidapi.com");
+            request.AddHeader("x-rapidapi-key", "2c55019311msha703d4f4d477ac6p1b0a95jsn20b3f6f65c02");
+            IRestResponse response = client.Execute(request);
+            JObject jobject = JObject.Parse(response.Content);
+
+            var lng = jobject["geometry"]["location"]["lng"];
+
+            return (float) lng.ToObject<double>();
 
         }
 
