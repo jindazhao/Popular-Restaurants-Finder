@@ -28,7 +28,7 @@ namespace Popular_Restaurants_Finder
             Console.ReadLine();
         }
 
-        static void FindRestaurants(double lat, double lang)
+        static void FindRestaurants(double lat, double lang) //https://rapidapi.com/appetitoso/api/food-search-engine?endpoint=55cdb48ce4b0b74f06700640
         {
             var client = new RestClient("https://appetitoso-best-food-dishes-v1.p.rapidapi.com/dish/suggestions/?radius=15&lang=it&lat=" + lat + "&lng=" + lang);
             var request = new RestRequest(Method.GET);
